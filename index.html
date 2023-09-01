@@ -98,13 +98,15 @@
                     const heicFile = inputFile.files[index];
                     statusMessage.textContent = `Converting file ${index + 1}...`;
 
-                    try {
-                        const convertedBlob = await heic2any({
-                            blob: heicFile,
-                            toType: fileType,
-                            quality: quality
-                        });
+                    const convertedBlob = await heic2any({
+                        blob: heicFile,
+                        toType: fileType,
+                        quality: quality
+                    }).catch(e => {
+                        console.error("Error during conversion:", e);
+                    });
 
+                    if (convertedBlob) {
                         convertedBlobs.push(convertedBlob);
                         convertedFileNames.push(heicFile.name.replace(/\.heic$/i, `.${fileExtension}`));
 
@@ -130,9 +132,6 @@
 
                         columnDiv.appendChild(figure);
                         thumbnailsDiv.appendChild(columnDiv);
-
-                    } catch (error) {
-                        console.error('Error converting one of the images:', error);
                     }
                 }
 
