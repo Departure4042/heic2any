@@ -44,26 +44,22 @@
                 </select>
             </div>
         </div>
-        <button class="btn btn-primary" id="convertButton" onclick="convertFiles()">Convert</button>
+        <button class="btn btn-primary" onclick="convertFiles()">Convert</button>
         <button class="btn btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted
             Images</button>
         <div class="status" id="statusMessage"></div>
-        <!-- Added Progress Bar -->
-        <div class="progress" style="margin-top: 10px;">
-            <div class="progress-bar" id="conversionProgress" style="width: 0%"></div>
+        <div class="progress">
+            <div class="bar" id="progressBar" style="width: 0%;"></div>
         </div>
     </div>
 
-    <div id="thumbnails"></div>
+    <div id="thumbnails" class="columns"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"
         integrity="sha512-VjmsArkf8Vv2yyvbXCyVxp+R3n4N2WyS1GEQ+YQxa7Hu0tx836WpY4nW9/T1W5JBmvuIsxkVH/DlHgp7NEMjDw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
         integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Darkmode.js/1.5.7/darkmode-js.min.js"
-        integrity="sha512-y61YvXQLQM3hubnG+D7IKUAaPlfwzjkNE5XdEZPzoxFXLeeS8TJQ4aUVmmHRrkk0OMz5FmZF1Fv88A79/W7mgw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         let convertedBlobs = [];
@@ -75,7 +71,6 @@
             const qualityInput = document.getElementById('qualityInput');
             const fileTypeSelect = document.getElementById('fileTypeSelect');
             const thumbnailsDiv = document.getElementById('thumbnails');
-            const conversionProgress = document.getElementById('conversionProgress');
 
             thumbnailsDiv.innerHTML = ''; // Clear previous thumbnails
             convertedBlobs = []; // Clear previously converted blobs
@@ -90,16 +85,12 @@
             const fileType = fileTypeSelect.value;
             const fileExtension = fileType.split('/')[1];
 
-            // Disable Convert button during conversion
-            document.getElementById('convertButton').disabled = true;
-
             // Convert each selected file
             for (let index = 0; index < inputFile.files.length; index++) {
                 const heicFile = inputFile.files[index];
 
                 // Update status message
-                statusMessage.textContent = `Converting file ${index + 1} of ${inputFile.files.length}...`;
-                conversionProgress.style.width = `${(index / inputFile.files.length) * 100}%`;
+                statusMessage.textContent = `Converting file ${index + 1}...`;
 
                 try {
                     const convertedBlob = await heic2any({
@@ -110,6 +101,9 @@
 
                     convertedBlobs.push(convertedBlob);
                     convertedFileNames.push(heicFile.name.replace(/\.heic$/i, `.${fileExtension}`));
+
+                    const columnDiv = document.createElement('div');
+                    columnDiv.className = 'column col-4'; // Create a 3-column grid. Adjust col-4 to col-3 for 4 columns, col-2 for 6 columns, etc.
 
                     const figure = document.createElement('figure');
                     figure.className = "figure";
@@ -129,7 +123,8 @@
                     figCaption.textContent = heicFile.name; // Use the file name as the caption
                     figure.appendChild(figCaption);
 
-                    thumbnailsDiv.appendChild(figure);
+                    columnDiv.appendChild(figure);
+                    thumbnailsDiv.appendChild(columnDiv);
 
                 } catch (error) {
                     console.error('Error converting one of the images:', error);
@@ -138,9 +133,7 @@
 
             // After all files have been converted
             statusMessage.textContent = 'Conversion complete!';
-            conversionProgress.style.width = '100%'; // Fill the progress bar
             document.getElementById('downloadBtn').disabled = false; // Enable the download button
-            document.getElementById('convertButton').disabled = false; // Re-enable Convert button
         }
 
         function downloadAll() {
@@ -160,9 +153,6 @@
                 link.click();
             });
         }
-
-        // Initialize Darkmode.js
-        new Darkmode().showWidget();
     </script>
     <div class="columns" style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
         <div class="column col-sm-12 col-md-6" style="text-align: left;">
@@ -202,16 +192,6 @@
                         <td style="border: 1px solid #ddd; padding: 8px;">jszip Library</td>
                         <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/jszip"
                                 target="_blank">cdnjs.com/libraries/jszip</a></td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Darkmode.js Library</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;"><a
-                                href="https://cdnjs.com/libraries/Darkmode.js" target="_blank">cdnjs.com/libraries/Darkmode.js</a></td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css Library</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css"
-                                target="_blank">cdnjs.com/libraries/spectre.css</a></td>
                     </tr>
                 </tbody>
             </table>
