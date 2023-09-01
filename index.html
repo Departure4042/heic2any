@@ -40,7 +40,7 @@
                     <div class="column col-sm-12 col-md-6 form-group">
                         <label for="qualityInput" class="form-label">Quality (0-100%): </label>
                         <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />
-                        <small>Higher quality will take longer.</small>
+                        
                     </div>
                     <div class="column col-sm-12 col-md-6 form-group">
                         <label for="fileTypeSelect" class="form-label">Output File Type: </label>
@@ -51,7 +51,7 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-lg" onclick="convertFiles()">Convert</button>
+                <button class="btn btn-primary btn-lg" id="convertButton" onclick="convertFiles()">Convert</button>
                 <button class="btn btn-secondary btn-lg" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted Images</button>
             </div>
         </div>
@@ -80,6 +80,7 @@
                 const qualityInput = document.getElementById('qualityInput');
                 const fileTypeSelect = document.getElementById('fileTypeSelect');
                 const thumbnailsDiv = document.getElementById('thumbnails');
+                const convertButton = document.getElementById('convertButton');
 
                 thumbnailsDiv.innerHTML = '';
                 convertedBlobs = [];
@@ -94,6 +95,9 @@
                 const fileType = fileTypeSelect.value;
                 const fileExtension = fileType.split('/')[1];
 
+                convertButton.disabled = true;
+                statusMessage.classList.add('toast-visible');
+                
                 for (let index = 0; index < inputFile.files.length; index++) {
                     const heicFile = inputFile.files[index];
                     statusMessage.textContent = `Converting file ${index + 1}...`;
@@ -136,6 +140,8 @@
                 }
 
                 statusMessage.textContent = 'Conversion complete!';
+                statusMessage.classList.remove('toast-visible');
+                convertButton.disabled = false;
                 document.getElementById('downloadBtn').disabled = false;
             }
 
@@ -162,7 +168,7 @@
             <div class="column col-sm-12 col-md-6" style="text-align: left;">
                 <h2>About HEIC Converter</h2>
                 <p>
-                    This web tool allows you to convert HEIC images to other popular formats. Unlike many online
+                    Convert HEIC images to other popular formats. Unlike many online
                     converters, all image processing happens directly on your computer. This means that your images never
                     leave your device, ensuring that your data remains private and secure. Conversion speed is dependant on your computer's speed and resources, so close other apps to speed up conversions.
                 </p>
