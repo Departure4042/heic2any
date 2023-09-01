@@ -28,7 +28,6 @@
 
 <body>
     <div class="container grid-lg" style="text-align: center; margin-top: 50px;">
-        <!-- Use card to group the conversion controls -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title h5">Conversion Controls</div>
@@ -41,6 +40,7 @@
                     <div class="column col-sm-12 col-md-6 form-group">
                         <label for="qualityInput" class="form-label">Quality (0-100%): </label>
                         <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />
+                        <small>Higher quality will take longer.</small>
                     </div>
                     <div class="column col-sm-12 col-md-6 form-group">
                         <label for="fileTypeSelect" class="form-label">Output File Type: </label>
@@ -55,160 +55,154 @@
                 <button class="btn btn-secondary btn-lg" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted Images</button>
             </div>
         </div>
-        <div class="status" id="statusMessage"></div>
+
+        <div class="toast toast-primary" id="statusMessage"></div>
+
         <div class="progress">
             <div class="bar" id="progressBar" style="width: 0%;"></div>
         </div>
-    </div>
+        
+        <div id="thumbnails" class="columns"></div>
 
-    <div id="thumbnails" class="columns"></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"
+            integrity="sha512-VjmsArkf8Vv2yyvbXCyVxp+R3n4N2WyS1GEQ+YQxa7Hu0tx836WpY4nW9/T1W5JBmvuIsxkVH/DlHgp7NEMjDw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+            integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            let convertedBlobs = [];
+            let convertedFileNames = [];
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"
-        integrity="sha512-VjmsArkf8Vv2yyvbXCyVxp+R3n4N2WyS1GEQ+YQxa7Hu0tx836WpY4nW9/T1W5JBmvuIsxkVH/DlHgp7NEMjDw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-        integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>
-        let convertedBlobs = [];
-        let convertedFileNames = [];
+            async function convertFiles() {
+                const statusMessage = document.getElementById('statusMessage');
+                const inputFile = document.getElementById('inputFile');
+                const qualityInput = document.getElementById('qualityInput');
+                const fileTypeSelect = document.getElementById('fileTypeSelect');
+                const thumbnailsDiv = document.getElementById('thumbnails');
 
-        async function convertFiles() {
-            const statusMessage = document.getElementById('statusMessage');
-            const inputFile = document.getElementById('inputFile');
-            const qualityInput = document.getElementById('qualityInput');
-            const fileTypeSelect = document.getElementById('fileTypeSelect');
-            const thumbnailsDiv = document.getElementById('thumbnails');
+                thumbnailsDiv.innerHTML = '';
+                convertedBlobs = [];
+                convertedFileNames = [];
 
-            thumbnailsDiv.innerHTML = ''; // Clear previous thumbnails
-            convertedBlobs = []; // Clear previously converted blobs
-            convertedFileNames = []; // Clear previously converted filenames
-
-            if (inputFile.files.length === 0) {
-                alert('Please select .HEIC files first.');
-                return;
-            }
-
-            const quality = qualityInput.value / 100; // Convert percentage to a value between 0 and 1
-            const fileType = fileTypeSelect.value;
-            const fileExtension = fileType.split('/')[1];
-
-            // Convert each selected file
-            for (let index = 0; index < inputFile.files.length; index++) {
-                const heicFile = inputFile.files[index];
-
-                // Update status message
-                statusMessage.textContent = `Converting file ${index + 1}...`;
-
-                try {
-                    const convertedBlob = await heic2any({
-                        blob: heicFile,
-                        toType: fileType,
-                        quality: quality
-                    });
-
-                    convertedBlobs.push(convertedBlob);
-                    convertedFileNames.push(heicFile.name.replace(/\.heic$/i, `.${fileExtension}`));
-
-                    const columnDiv = document.createElement('div');
-                    columnDiv.className = 'column col-4'; // Create a 3-column grid. Adjust col-4 to col-3 for 4 columns, col-2 for 6 columns, etc.
-
-                    const figure = document.createElement('figure');
-                    figure.className = "figure";
-
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(convertedBlob);
-                    img.alt = heicFile.name; // Using the file name as the alt text
-                    img.className = "thumbnail img-responsive"; // Added img-responsive
-                    img.onclick = function () {
-                        window.open(img.src, '_blank'); // Open the full-sized image in a new tab
-                    };
-                    figure.appendChild(img);
-
-                    // Adding the file name as a caption:
-                    const figCaption = document.createElement('figcaption');
-                    figCaption.className = "figure-caption";
-                    figCaption.textContent = heicFile.name; // Use the file name as the caption
-                    figure.appendChild(figCaption);
-
-                    columnDiv.appendChild(figure);
-                    thumbnailsDiv.appendChild(columnDiv);
-
-                } catch (error) {
-                    console.error('Error converting one of the images:', error);
+                if (inputFile.files.length === 0) {
+                    alert('Please select .HEIC files first.');
+                    return;
                 }
+
+                const quality = qualityInput.value / 100;
+                const fileType = fileTypeSelect.value;
+                const fileExtension = fileType.split('/')[1];
+
+                for (let index = 0; index < inputFile.files.length; index++) {
+                    const heicFile = inputFile.files[index];
+                    statusMessage.textContent = `Converting file ${index + 1}...`;
+
+                    try {
+                        const convertedBlob = await heic2any({
+                            blob: heicFile,
+                            toType: fileType,
+                            quality: quality
+                        });
+
+                        convertedBlobs.push(convertedBlob);
+                        convertedFileNames.push(heicFile.name.replace(/\.heic$/i, `.${fileExtension}`));
+
+                        const columnDiv = document.createElement('div');
+                        columnDiv.className = 'column col-4';
+
+                        const figure = document.createElement('figure');
+                        figure.className = "figure";
+
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(convertedBlob);
+                        img.alt = heicFile.name;
+                        img.className = "thumbnail img-responsive";
+                        img.onclick = function () {
+                            window.open(img.src, '_blank');
+                        };
+                        figure.appendChild(img);
+
+                        const figCaption = document.createElement('figcaption');
+                        figCaption.className = "figure-caption";
+                        figCaption.textContent = heicFile.name;
+                        figure.appendChild(figCaption);
+
+                        columnDiv.appendChild(figure);
+                        thumbnailsDiv.appendChild(columnDiv);
+
+                    } catch (error) {
+                        console.error('Error converting one of the images:', error);
+                    }
+                }
+
+                statusMessage.textContent = 'Conversion complete!';
+                document.getElementById('downloadBtn').disabled = false;
             }
 
-            // After all files have been converted
-            statusMessage.textContent = 'Conversion complete!';
-            document.getElementById('downloadBtn').disabled = false; // Enable the download button
-        }
+            function downloadAll() {
+                const zip = new JSZip();
 
-        function downloadAll() {
-            const zip = new JSZip();
+                convertedBlobs.forEach((blob, index) => {
+                    zip.file(convertedFileNames[index], blob);
+                });
 
-            convertedBlobs.forEach((blob, index) => {
-                zip.file(convertedFileNames[index], blob);
-            });
+                zip.generateAsync({
+                    type: "blob"
+                })
+                .then((content) => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = 'converted_images.zip';
+                    link.click();
+                });
+            }
+        </script>
 
-            zip.generateAsync({
-                type: "blob"
-            })
-            .then((content) => {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = 'converted_images.zip';
-                link.click();
-            });
-        }
-    </script>
-    <div class="columns" style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
-        <div class="column col-sm-12 col-md-6" style="text-align: left;">
-            <h2>About HEIC Converter</h2>
-            <p>
-                This web tool allows you to convert HEIC images to other popular formats like PNG, JPEG, and GIF. One of
-                the primary advantages of this converter is its commitment to user privacy. Unlike many online
-                converters, all image processing happens directly on your computer. This means that your images never
-                leave your device, ensuring that your data remains private and secure.
-            </p>
-            <p>
-                No uploads, no potential privacy breaches. Your images remain yours, and only yours.
-            </p>
-            <p>
-                Please note, this tool relies on scripts from CDNJS, which means an active internet connection is
-                required for initial loading. These scripts are tamper-proof and delivered over secure channels,
-                ensuring the integrity and security of the tool's functionality.
-            </p>
+        <div class="columns" style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+            <div class="column col-sm-12 col-md-6" style="text-align: left;">
+                <h2>About HEIC Converter</h2>
+                <p>
+                    This web tool allows you to convert HEIC images to other popular formats. Unlike many online
+                    converters, all image processing happens directly on your computer. This means that your images never
+                    leave your device, ensuring that your data remains private and secure. Conversion speed is dependant on your computer's speed and resources, so close other apps to speed up conversions.
+                </p>
+            
+                <p>
+                    Please note, this tool relies on scripts from CDNJS, which means an active internet connection is
+                    required for initial loading. These scripts are tamper-proof and delivered over secure channels,
+                    ensuring the integrity and security of the tool's functionality.
+                </p>
+            </div>
+            <div class="column col-sm-12 col-md-6" style="text-align: left;">
+                <h3>Libraries used</h3>
+                <table style="margin: 0 auto; border-collapse: collapse; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Library/Resource</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">heic2any Library</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/heic2any"
+                                    target="_blank">cdnjs.com/libraries/heic2any</a></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">jszip Library</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/jszip"
+                                    target="_blank">cdnjs.com/libraries/jszip</a></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css"
+                                    target="_blank">cdnjs.com/libraries/spectre.css</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="column col-sm-12 col-md-6" style="text-align: left;">
-            <h3>Libraries used</h3>
-            <table style="margin: 0 auto; border-collapse: collapse; width: 100%;">
-                <thead>
-                    <tr>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Library/Resource</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">heic2any Library</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/heic2any"
-                                target="_blank">cdnjs.com/libraries/heic2any</a></td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">jszip Library</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/jszip"
-                                target="_blank">cdnjs.com/libraries/jszip</a></td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css"
-                                target="_blank">cdnjs.com/libraries/spectre.css</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
     
 </body>
 
