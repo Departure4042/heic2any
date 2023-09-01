@@ -44,10 +44,14 @@
                 </select>
             </div>
         </div>
-        <button class="btn btn-primary" onclick="convertFiles()">Convert</button>
+        <button class="btn btn-primary" id="convertButton" onclick="convertFiles()">Convert</button>
         <button class="btn btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted
             Images</button>
         <div class="status" id="statusMessage"></div>
+        <!-- Added Progress Bar -->
+        <div class="progress" style="margin-top: 10px;">
+            <div class="progress-bar" id="conversionProgress" style="width: 0%"></div>
+        </div>
     </div>
 
     <div id="thumbnails"></div>
@@ -71,6 +75,7 @@
             const qualityInput = document.getElementById('qualityInput');
             const fileTypeSelect = document.getElementById('fileTypeSelect');
             const thumbnailsDiv = document.getElementById('thumbnails');
+            const conversionProgress = document.getElementById('conversionProgress');
 
             thumbnailsDiv.innerHTML = ''; // Clear previous thumbnails
             convertedBlobs = []; // Clear previously converted blobs
@@ -85,12 +90,16 @@
             const fileType = fileTypeSelect.value;
             const fileExtension = fileType.split('/')[1];
 
+            // Disable Convert button during conversion
+            document.getElementById('convertButton').disabled = true;
+
             // Convert each selected file
             for (let index = 0; index < inputFile.files.length; index++) {
                 const heicFile = inputFile.files[index];
 
                 // Update status message
-                statusMessage.textContent = `Converting file ${index + 1}...`;
+                statusMessage.textContent = `Converting file ${index + 1} of ${inputFile.files.length}...`;
+                conversionProgress.style.width = `${(index / inputFile.files.length) * 100}%`;
 
                 try {
                     const convertedBlob = await heic2any({
@@ -129,7 +138,9 @@
 
             // After all files have been converted
             statusMessage.textContent = 'Conversion complete!';
+            conversionProgress.style.width = '100%'; // Fill the progress bar
             document.getElementById('downloadBtn').disabled = false; // Enable the download button
+            document.getElementById('convertButton').disabled = false; // Re-enable Convert button
         }
 
         function downloadAll() {
