@@ -19,27 +19,26 @@
             margin: 10px 0;
         }
     </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css" integrity="sha512-9RIcp1f4CE6dEuYX9085tXaEbYd1ap04d2Av1ub/dwuT33WbfbHStDdQ+shKrp5wzZzleh5DOg+7ABSnaQP/nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css" integrity="sha512-9RIcp1f4CE6dEuYX9085tXaEbYd1ap04d2Av1ub/dwuT33WbfbHStDdQ+shKrp5wzZzleh5DOg+7ABSnaQP/nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="container grid-lg" style="text-align: center; margin-top: 50px;">
         <input class="form-input" type="file" id="inputFile" accept=".heic" multiple />
         
-        
-<div class="columns">
-    <div class="column col-sm-12 col-md-6">
-        <label for="qualityInput">Quality (0-100%): </label>
-        <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />
-    </div>
-    <div class="column col-sm-12 col-md-6">
-        <label for="fileTypeSelect">Output File Type: </label>
-        <select class="form-select" id="fileTypeSelect">
-            <option value="image/png" selected>PNG</option>
-            <option value="image/jpeg">JPEG</option>
-            <option value="image/gif">GIF</option>
-        </select>
-    </div>
-</div>
+        <div class="columns">
+            <div class="column col-sm-12 col-md-6">
+                <label for="qualityInput">Quality (0-100%): </label>
+                <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />%
+            </div>
+            <div class="column col-sm-12 col-md-6">
+                <label for="fileTypeSelect">Output File Type: </label>
+                <select class="form-select" id="fileTypeSelect">
+                    <option value="image/png" selected>PNG</option>
+                    <option value="image/jpeg">JPEG</option>
+                    <option value="image/gif">GIF</option>
+                </select>
+            </div>
+        </div>
 
         <button class="btn btn-primary" onclick="convertFiles()">Convert</button>
         <button class="btn btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted Images</button>
@@ -102,7 +101,7 @@
                     };
                     thumbnailsDiv.appendChild(img);
                 } catch (error) {
-                    alert('Error converting one of the images:', error);
+                    console.error('Error converting one of the images:', error);
                 }
             }
 
@@ -131,49 +130,46 @@
         new Darkmode().showWidget();
     </script>
 
-<div style="text-align: center; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
-    <h2>About HEIC Converter</h2>
-    <p>
-        This web tool allows you to convert HEIC images to other popular formats like PNG, JPEG, and GIF. One of the primary advantages of this converter is its commitment to user privacy. Unlike many online converters, all image processing happens directly on your computer. This means that your images never leave your device, ensuring that your data remains private and secure.
-    </p>
-    <p>
-        No uploads, no waiting for server responses, and most importantly, no potential privacy breaches. Your images remain yours, and only yours.
-    </p>
-    <p>
-        Please note, this tool relies on scripts from CDNJS, which means an active internet connection is required for initial loading. These scripts are tamper-proof and delivered over secure channels, ensuring the integrity and security of the tool's functionality.
-    </p>
-</div>
-<div style="text-align: center; margin-top: 40px;">
-    <h3>Resources and Source Code</h3>
-    <table style="margin: 0 auto; border-collapse: collapse; width: 80%;">
-        <thead>
-            <tr>
-                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Library/Resource</th>
-                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">heic2any Library</td>
-                <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/heic2any" target="_blank">cdnjs.com/libraries/heic2any</a></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">jszip Library</td>
-                <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/jszip" target="_blank">cdnjs.com/libraries/jszip</a></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">Darkmode.js Library</td>
-                <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/Darkmode.js" target="_blank">cdnjs.com/libraries/Darkmode.js</a></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css Library</td>
-                <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css" target="_blank">cdnjs.com/libraries/spectre.css</a></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-
-
+    <div style="text-align: center; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <h2>About HEIC Converter</h2>
+        <p>
+            This web tool allows you to convert HEIC images to other popular formats like PNG, JPEG, and GIF. One of the primary advantages of this converter is its commitment to user privacy. Unlike many online converters, all image processing happens directly on your computer. This means that your images never leave your device, ensuring that your data remains private and secure.
+        </p>
+        <p>
+            No uploads, no waiting for server responses, and most importantly, no potential privacy breaches. Your images remain yours, and only yours.
+        </p>
+        <p>
+            Please note, this tool relies on scripts from CDNJS, which means an active internet connection is required for initial loading. These scripts are tamper-proof and delivered over secure channels, ensuring the integrity and security of the tool's functionality.
+        </p>
+    </div>
+    <div style="text-align: center; margin-top: 40px;">
+        <h3>Resources and Source Code</h3>
+        <table style="margin: 0 auto; border-collapse: collapse; width: 80%;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Library/Resource</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">heic2any Library</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/heic2any" target="_blank">cdnjs.com/libraries/heic2any</a></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">jszip Library</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/jszip" target="_blank">cdnjs.com/libraries/jszip</a></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Darkmode.js Library</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/Darkmode.js" target="_blank">cdnjs.com/libraries/Darkmode.js</a></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css Library</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css" target="_blank">cdnjs.com/libraries/spectre.css</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
