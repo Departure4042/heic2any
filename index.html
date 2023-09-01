@@ -5,9 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HEIC Converter</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css"
-        integrity="sha512-9RIcp1f4CE6dEuYX9085tXaEbYd1ap04d2Av1ub/dwuT33WbfbHStDdQ+shKrp5wzZzleh5DOg+7ABSnaQP/nQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css" integrity="sha512-9RIcp1f4CE6dEuYX9085tXaEbYd1ap04d2Av1ub/dwuT33WbfbHStDdQ+shKrp5wzZzleh5DOg+7ABSnaQP/nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Darkmode.js/1.5.7/darkmode-js.min.js" integrity="sha512-y61YvXQLQM3hubnG+D7IKUAaPlfwzjkNE5XdEZPzoxFXLeeS8TJQ4aUVmmHRrkk0OMz5FmZF1Fv88A79/W7mgw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         .thumbnail {
             display: inline-block;
@@ -17,13 +16,6 @@
             border: 1px solid #ddd;
             padding: 5px;
         }
-
-        .status {
-            color: blue;
-            font-size: 0.9em;
-            margin: 10px 0;
-        }
-
         #statusMessage {
             position: fixed;
             top: 10px;
@@ -32,13 +24,15 @@
             z-index: 1000;
             display: none;
         }
-
         .toast-visible {
             display: block;
         }
+        #loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Darkmode.js/1.5.7/darkmode-js.min.js" integrity="sha512-y61YvXQLQM3hubnG+D7IKUAaPlfwzjkNE5XdEZPzoxFXLeeS8TJQ4aUVmmHRrkk0OMz5FmZF1Fv88A79/W7mgw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 </head>
 
 <body>
@@ -71,23 +65,21 @@
         </div>
 
         <div class="toast toast-primary" id="statusMessage"></div>
-
         <div class="progress">
             <div class="bar" id="progressBar" style="width: 0%;"></div>
         </div>
         
         <div id="thumbnails" class="columns"></div>
+        <div id="loader">
+            <div class="loading loading-lg"></div>
+            <p>Converting...</p>
+        </div>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"
-            integrity="sha512-VjmsArkf8Vv2yyvbXCyVxp+R3n4N2WyS1GEQ+YQxa7Hu0tx836WpY4nW9/T1W5JBmvuIsxkVH/DlHgp7NEMjDw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-            integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js" integrity="sha512-VjmsArkf8Vv2yyvbXCyVxp+R3n4N2WyS1GEQ+YQxa7Hu0tx836WpY4nW9/T1W5JBmvuIsxkVH/DlHgp7NEMjDw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script>
             let convertedBlobs = [];
             let convertedFileNames = [];
-
             async function convertFiles() {
                 const statusMessage = document.getElementById('statusMessage');
                 const inputFile = document.getElementById('inputFile');
@@ -95,48 +87,36 @@
                 const fileTypeSelect = document.getElementById('fileTypeSelect');
                 const thumbnailsDiv = document.getElementById('thumbnails');
                 const convertButton = document.getElementById('convertButton');
-
                 thumbnailsDiv.innerHTML = '';
                 convertedBlobs = [];
                 convertedFileNames = [];
-
                 if (inputFile.files.length === 0) {
                     alert('Please select .HEIC files first.');
                     return;
                 }
-
                 const quality = qualityInput.value / 100;
                 const fileType = fileTypeSelect.value;
                 const fileExtension = fileType.split('/')[1];
-
                 convertButton.disabled = true;
                 statusMessage.classList.add('toast-visible');
-                
+                document.getElementById('loader').style.display = 'block';
                 for (let index = 0; index < inputFile.files.length; index++) {
                     const heicFile = inputFile.files[index];
                     statusMessage.textContent = `Converting file ${index + 1}...`;
-
-                    const startTime = Date.now();
-
                     const convertedBlob = await heic2any({
                         blob: heicFile,
                         toType: fileType,
                         quality: quality
+                    }).catch(e => {
+                        console.error("Error during conversion:", e);
                     });
-
-                    const endTime = Date.now();
-                    const conversionTime = (endTime - startTime) / 1000;
-
                     if (convertedBlob) {
                         convertedBlobs.push(convertedBlob);
                         convertedFileNames.push(heicFile.name.replace(/\.heic$/i, `.${fileExtension}`));
-
                         const columnDiv = document.createElement('div');
                         columnDiv.className = 'column col-4';
-
                         const figure = document.createElement('figure');
                         figure.className = "figure";
-
                         const img = document.createElement('img');
                         img.src = URL.createObjectURL(convertedBlob);
                         img.alt = heicFile.name;
@@ -145,30 +125,25 @@
                             window.open(img.src, '_blank');
                         };
                         figure.appendChild(img);
-
                         const figCaption = document.createElement('figcaption');
                         figCaption.className = "figure-caption";
-                        figCaption.textContent = `${heicFile.name} - Converted in ${conversionTime.toFixed(2)} seconds`;
+                        figCaption.textContent = heicFile.name;
                         figure.appendChild(figCaption);
-
                         columnDiv.appendChild(figure);
                         thumbnailsDiv.appendChild(columnDiv);
                     }
                 }
-
                 statusMessage.textContent = 'Conversion complete!';
                 statusMessage.classList.remove('toast-visible');
                 convertButton.disabled = false;
                 document.getElementById('downloadBtn').disabled = false;
+                document.getElementById('loader').style.display = 'none';
             }
-
             function downloadAll() {
                 const zip = new JSZip();
-
                 convertedBlobs.forEach((blob, index) => {
                     zip.file(convertedFileNames[index], blob);
                 });
-
                 zip.generateAsync({
                     type: "blob"
                 })
@@ -179,6 +154,7 @@
                     link.click();
                 });
             }
+            new Darkmode().showWidget();
         </script>
 
         <div class="columns" style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
@@ -189,7 +165,6 @@
                     converters, all image processing happens directly on your computer. This means that your images never
                     leave your device, ensuring that your data remains private and secure. Conversion speed is dependant on your computer's speed and resources, so close other apps to speed up conversions.
                 </p>
-            
                 <p>
                     Please note, this tool relies on scripts from CDNJS, which means an active internet connection is
                     required for initial loading. These scripts are tamper-proof and delivered over secure channels,
@@ -221,7 +196,6 @@
                             <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css"
                                     target="_blank">cdnjs.com/libraries/spectre.css</a></td>
                         </tr>
-                        <!-- Adding Darkmode.js source link -->
                         <tr>
                             <td style="border: 1px solid #ddd; padding: 8px;">Darkmode.js</td>
                             <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/Darkmode.js"
@@ -230,13 +204,8 @@
                     </tbody>
                 </table>
             </div>
-            
         </div>
-    
-        <script>
-            new Darkmode().showWidget();
-        </script>
-        
-    </body>
+    </div>
+</body>
 
 </html>
