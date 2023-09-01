@@ -29,7 +29,7 @@
 <div class="columns">
     <div class="column col-sm-12 col-md-6">
         <label for="qualityInput">Quality (0-100%): </label>
-        <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />%
+        <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />
     </div>
     <div class="column col-sm-12 col-md-6">
         <label for="fileTypeSelect">Output File Type: </label>
@@ -40,11 +40,6 @@
         </select>
     </div>
 </div>
-
-            <option value="image/png" selected>PNG</option>
-            <option value="image/jpeg">JPEG</option>
-            <option value="image/gif">GIF</option>
-        </select>
 
         <button class="btn btn-primary" onclick="convertFiles()">Convert</button>
         <button class="btn btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted Images</button>
