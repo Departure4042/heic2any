@@ -23,6 +23,20 @@
             font-size: 0.9em;
             margin: 10px 0;
         }
+
+        /* Custom styling for the toast message */
+        #statusMessage {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: none; /* By default, the toast is hidden */
+        }
+
+        .toast-visible {
+            display: block; /* When the toast should be shown, we display it */
+        }
     </style>
 </head>
 
