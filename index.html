@@ -19,23 +19,24 @@
             margin: 10px 0;
         }
     </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css" integrity="sha512-9RIcp1f4CE6dEuYX9085tXaEbYd1ap04d2Av1ub/dwuT33WbfbHStDdQ+shKrp5wzZzleh5DOg+7ABSnaQP/nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <div style="text-align: center;">
-        <input type="file" id="inputFile" accept=".heic" multiple />
+    <div class="container grid-lg" style="text-align: center; margin-top: 50px;">
+        <input class="form-input" type="file" id="inputFile" accept=".heic" multiple />
         
         <label for="qualityInput">Quality (0-100%): </label>
-        <input type="number" id="qualityInput" min="0" max="100" value="80" />%
+        <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />%
 
         <label for="fileTypeSelect">Output File Type: </label>
-        <select id="fileTypeSelect">
+        <select class="form-select" id="fileTypeSelect">
             <option value="image/png" selected>PNG</option>
             <option value="image/jpeg">JPEG</option>
             <option value="image/gif">GIF</option>
         </select>
 
-        <button onclick="convertFiles()">Convert</button>
-        <button id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted Images</button>
+        <button class="btn btn-primary" onclick="convertFiles()">Convert</button>
+        <button class="btn btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>Download All Converted Images</button>
 
         <div class="status" id="statusMessage"></div>
     </div>
@@ -159,12 +160,17 @@
                 <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/Darkmode.js" target="_blank">cdnjs.com/libraries/Darkmode.js</a></td>
             </tr>
             <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css Library</td>
+                <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css" target="_blank">cdnjs.com/libraries/spectre.css</a></td>
+            </tr>
+            <tr>
                 <td style="border: 1px solid #ddd; padding: 8px;">Current index.html Source Code</td>
                 <td style="border: 1px solid #ddd; padding: 8px;"><a href="/mnt/data/updated_index.html" download>Download</a></td>
             </tr>
         </tbody>
     </table>
 </div>
+
 
 
 </body>
