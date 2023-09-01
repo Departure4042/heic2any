@@ -25,11 +25,22 @@
     <div class="container grid-lg" style="text-align: center; margin-top: 50px;">
         <input class="form-input" type="file" id="inputFile" accept=".heic" multiple />
         
+        
+<div class="columns">
+    <div class="column col-sm-12 col-md-6">
         <label for="qualityInput">Quality (0-100%): </label>
         <input class="form-input" type="number" id="qualityInput" min="0" max="100" value="80" />%
-
+    </div>
+    <div class="column col-sm-12 col-md-6">
         <label for="fileTypeSelect">Output File Type: </label>
         <select class="form-select" id="fileTypeSelect">
+            <option value="image/png" selected>PNG</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/gif">GIF</option>
+        </select>
+    </div>
+</div>
+
             <option value="image/png" selected>PNG</option>
             <option value="image/jpeg">JPEG</option>
             <option value="image/gif">GIF</option>
@@ -162,10 +173,6 @@
             <tr>
                 <td style="border: 1px solid #ddd; padding: 8px;">Spectre.css Library</td>
                 <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://cdnjs.com/libraries/spectre.css" target="_blank">cdnjs.com/libraries/spectre.css</a></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">Current index.html Source Code</td>
-                <td style="border: 1px solid #ddd; padding: 8px;"><a href="/mnt/data/updated_index.html" download>Download</a></td>
             </tr>
         </tbody>
     </table>
